@@ -18,15 +18,13 @@ jobs:
 
       - name: Clone Source Code
         run: |
-          # 改为拉取开发者提交 TR3600 支持的专属分支
+          # 仅拉取包含 TR3600 硬件支持的开发者分支，它本身已自带 Passwall 源
           git clone -b agent/cudy-tr3600-v1-6.12 --single-branch https://github.com/soapmancn/openwrt.git openwrt
 
       - name: Update & Install Feeds
         run: |
           cd openwrt
-          # 使用原生 OpenWrt 源码，必须手动添加 Passwall 的软件源
-          echo "src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main" >> "feeds.conf.default"
-          echo "src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main" >> "feeds.conf.default"
+          # 直接更新并安装内置软件源，不再画蛇添足强行外挂
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
@@ -60,5 +58,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Cudy-TR3600-Firmware
-          # 放宽限制，抓取该目录下所有生成的文件，避免遗漏
+          # 放宽路径限制，抓取生成的所有文件
           path: openwrt/bin/targets/mediatek/filogic/*
