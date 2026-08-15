@@ -1,7 +1,7 @@
 name: Build Cudy TR3600 OpenWrt with Passwall
 
 on:
-  workflow_dispatch: # 支持手动一键点击运行
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,19 +20,15 @@ jobs:
         run: |
           git clone -b openwrt-23.05 --single-branch https://github.com/immortalwrt/immortalwrt.git openwrt
 
-      - name: Add Feeds & Passwall
+      - name: Update & Install Feeds
         run: |
           cd openwrt
-          # 添加 passwall 软件源
-          echo "src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main" >> "feeds.conf.default"
-          echo "src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main" >> "feeds.conf.default"
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
       - name: Generate Config
         run: |
           cd openwrt
-          # 设置目标架构为联发科 Filogic / MT7981 / MT7988 平台并选定 TR3600
           cat <<EOF > .config
           CONFIG_TARGET_mediatek=y
           CONFIG_TARGET_mediatek_filogic=y
